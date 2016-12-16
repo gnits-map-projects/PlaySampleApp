@@ -114,7 +114,8 @@ public class BookController extends Controller {
             return badRequest();
         }
 
-        // TODO this code is identical to the code in createBook, remove into a separate method
+        // TODO this code is identical to the code in createBook
+        // Code duplicate is bad, move the code into a common method
 
         final JsonNode json = request().body().asJson();
         if (null == json) {
