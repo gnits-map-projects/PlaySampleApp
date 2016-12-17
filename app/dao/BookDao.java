@@ -9,7 +9,7 @@ import javax.inject.Inject;
 import javax.persistence.TypedQuery;
 import java.util.List;
 
-public class BookDao {
+public class BookDao implements CrudDao<Integer, Book> {
 
     private JPAApi jpaApi;
 
@@ -31,7 +31,7 @@ public class BookDao {
         return existingBook;
     }
 
-    public void delete(Integer id) {
+    public void deleteById(Integer id) {
 
         Book book = findById(id);
         jpaApi.em().remove(book);
