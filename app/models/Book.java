@@ -1,10 +1,16 @@
 package models;
 
 
+import javax.persistence.*;
+
+@Entity
 public class Book {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
+    @Basic
     private String title;
 
     public Book() {

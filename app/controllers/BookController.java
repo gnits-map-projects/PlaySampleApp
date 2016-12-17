@@ -3,50 +3,42 @@ package controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.ImmutableList;
+import com.google.inject.Inject;
 import models.Book;
 import play.Logger;
+import play.db.jpa.JPAApi;
+import play.db.jpa.Transactional;
 import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
 
+import javax.persistence.TypedQuery;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class BookController extends Controller {
 
-    // store books using id as key
-    private Map<Integer, Book> booksIndex;
+    private JPAApi jpaApi;
 
-    public BookController() {
-
-        // temporary collection of books
-        final Collection<Book> books = ImmutableList.of(
-                new Book(1, "Title 1"),
-                new Book(2, "Title 3"),
-                new Book(3, "Title 3")
-        );
-
-        // populate the map using the temp array
-        // use the book id as key
-        booksIndex = new HashMap<>();
-        for (Book book : books) {
-            booksIndex.put(book.getId(), book);
-        }
-
+    @Inject
+    public BookController(JPAApi jpaApi) {
+        this.jpaApi = jpaApi;
     }
 
+    @Transactional
     public Result getAllBooks() {
 
-        // grab all values from the map, ignoring the keys
-        final Collection<Book> books = booksIndex.values();
-        Logger.debug("books {}", books);
+        TypedQuery<Book> query = jpaApi.em().createQuery("SELECT b FROM Book b", Book.class);
+        List<Book> books = query.getResultList();
 
-        JsonNode json = Json.toJson(books);
+        final JsonNode json = Json.toJson(books);
 
         return ok(json);
     }
 
+    @Transactional
     public Result createBook() {
 
         final JsonNode json = request().body().asJson();
@@ -62,52 +54,48 @@ public class BookController extends Controller {
         }
 
         // make sure id and title is not null
-        if (null == book.getId() || null == book.getTitle()) {
+        if (null == book.getTitle()) {
             return badRequest();
         }
 
-        // check if the id already exists
-        if (booksIndex.containsKey(book.getId())) {
-            Logger.error("Book with id {} already exists", book.getId());
-            return badRequest();
-        }
-
-        // will replace any book with the same id
-        booksIndex.put(book.getId(), book);
+        jpaApi.em().persist(book);
 
         return created();
     }
 
+    @Transactional
     public Result getBookById(Integer id) {
 
         if (null == id) {
             return badRequest();
         }
 
-        final Book book = booksIndex.get(id);
-        if (null == book) {
-            return notFound();
-        }
+        final Book book = jpaApi.em().find(Book.class, id);
+        Logger.debug("get book {}", book);
 
-        JsonNode json = Json.toJson(book);
+        final JsonNode json = Json.toJson(book);
 
         return ok(json);
     }
 
+    @Transactional
     public Result deleteBookById(Integer id) {
 
         if (null == id) {
             return badRequest();
         }
 
-        final Book book = booksIndex.remove(id);
+        final Book book = jpaApi.em().find(Book.class, id);
         if (null == book) {
             return notFound();
         }
 
+        jpaApi.em().remove(book);
+
         return noContent();
     }
 
+    @Transactional
     public Result updateBookById(Integer id) {
 
         if (null == id) {
@@ -130,14 +118,18 @@ public class BookController extends Controller {
         }
 
         // make sure id and title is not null
-        if (null == book.getId() || null == book.getTitle()) {
+        if (null == book.getTitle()) {
             return badRequest();
         }
 
-        // check if the id already exists
-        if (null == booksIndex.replace(book.getId(), book)) {
+        final Book existingBook = jpaApi.em().find(Book.class, id);
+        if (null == existingBook) {
             return notFound();
         }
+
+        existingBook.setTitle(book.getTitle());
+
+        jpaApi.em().merge(existingBook);
 
         // return the new updated book
         return ok(json);
