@@ -2,36 +2,30 @@ package controllers;
 
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.google.common.collect.ImmutableList;
-import com.google.inject.Inject;
+import dao.BookDao;
+import exceptions.NotFoundException;
 import models.Book;
 import play.Logger;
-import play.db.jpa.JPAApi;
 import play.db.jpa.Transactional;
 import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
 
-import javax.persistence.TypedQuery;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class BookController extends Controller {
 
-    private JPAApi jpaApi;
+    private BookDao bookDao;
 
-    @Inject
-    public BookController(JPAApi jpaApi) {
-        this.jpaApi = jpaApi;
+    @javax.inject.Inject
+    public BookController(BookDao bookDao) {
+        this.bookDao = bookDao;
     }
 
     @Transactional
     public Result getAllBooks() {
 
-        TypedQuery<Book> query = jpaApi.em().createQuery("SELECT b FROM Book b", Book.class);
-        List<Book> books = query.getResultList();
+        Collection<Book> books = bookDao.findAll();
 
         final JsonNode json = Json.toJson(books);
 
@@ -53,12 +47,12 @@ public class BookController extends Controller {
             return badRequest();
         }
 
-        // make sure id and title is not null
+        // make sure the title is not null
         if (null == book.getTitle()) {
             return badRequest();
         }
 
-        jpaApi.em().persist(book);
+        bookDao.persist(book);
 
         return created();
     }
@@ -70,12 +64,13 @@ public class BookController extends Controller {
             return badRequest();
         }
 
-        final Book book = jpaApi.em().find(Book.class, id);
-        Logger.debug("get book {}", book);
-
-        final JsonNode json = Json.toJson(book);
-
-        return ok(json);
+        try {
+            final Book book = bookDao.findById(id);
+            final JsonNode json = Json.toJson(book);
+            return ok(json);
+        } catch (NotFoundException ex) {
+            return notFound();
+        }
     }
 
     @Transactional
@@ -85,14 +80,12 @@ public class BookController extends Controller {
             return badRequest();
         }
 
-        final Book book = jpaApi.em().find(Book.class, id);
-        if (null == book) {
+        try {
+            bookDao.delete(id);
+            return noContent();
+        } catch (NotFoundException ex) {
             return notFound();
         }
-
-        jpaApi.em().remove(book);
-
-        return noContent();
     }
 
     @Transactional
@@ -103,7 +96,7 @@ public class BookController extends Controller {
         }
 
         // TODO this code is identical to the code in createBook
-        // Code duplicate is bad, move the code into a common method
+        // Code duplication is bad, move the code into a common method
 
         final JsonNode json = request().body().asJson();
         if (null == json) {
@@ -117,22 +110,17 @@ public class BookController extends Controller {
             return badRequest();
         }
 
-        // make sure id and title is not null
+        // make sure the title is not null
         if (null == book.getTitle()) {
             return badRequest();
         }
 
-        final Book existingBook = jpaApi.em().find(Book.class, id);
-        if (null == existingBook) {
+        try {
+            bookDao.update(book);
+            return ok(json);
+        } catch (NotFoundException ex) {
             return notFound();
         }
-
-        existingBook.setTitle(book.getTitle());
-
-        jpaApi.em().merge(existingBook);
-
-        // return the new updated book
-        return ok(json);
     }
 
 }
