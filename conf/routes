@@ -37,5 +37,12 @@ DELETE /books/:id                   controllers.BookController.deleteBookById(id
 PUT /books/:id                      controllers.BookController.updateBookById(id: Integer)
 
 
+# Image controller
+
+POST /images                        controllers.ImageController.uploadImage()
+GET /images/:id                     controllers.ImageController.downloadImage(id: String)
+DELETE /images/:id                  controllers.ImageController.deleteImage(id: String)
+
+
 
 

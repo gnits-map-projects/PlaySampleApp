@@ -81,7 +81,7 @@ public class BookController extends Controller {
         }
 
         try {
-            bookDao.delete(id);
+            bookDao.deleteById(id);
             return noContent();
         } catch (NotFoundException ex) {
             return notFound();
