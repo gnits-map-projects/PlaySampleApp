@@ -43,6 +43,12 @@ POST /images                        controllers.ImageController.uploadImage()
 GET /images/:id                     controllers.ImageController.downloadImage(id: String)
 DELETE /images/:id                  controllers.ImageController.deleteImage(id: String)
 
+# User controller
+
+POST /user/register                 controller.UserController.register()
+POST /user/signin                   controller.UserController.signIn()
+POST /user/signout/:token           controller.UserController.signOut(token: String)
+
 
 
 
