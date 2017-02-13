@@ -15,7 +15,22 @@ public class UserController extends Controller {
         this.userService = userService;
     }
 
-    public Result register() {
+    public Result createUser() {
+
+        return status(NOT_IMPLEMENTED);
+    }
+
+    public Result getUser(Integer id) {
+
+        return status(NOT_IMPLEMENTED);
+    }
+
+    public Result updateUser(Integer id) {
+
+        return status(NOT_IMPLEMENTED);
+    }
+
+    public Result deleteUser(Integer id) {
 
         return status(NOT_IMPLEMENTED);
     }
@@ -25,22 +40,12 @@ public class UserController extends Controller {
         return status(NOT_IMPLEMENTED);
     }
 
-    public Result signOut(String token) {
+    public Result signOut() {
 
         return status(NOT_IMPLEMENTED);
     }
 
-    public Result setRole(Integer role) {
-
-        return status(NOT_IMPLEMENTED);
-    }
-
-    public Result status(Integer status) {
-
-        return status(NOT_IMPLEMENTED);
-    }
-
-    public Result delete() {
+    public Result getCurrentUser() {
 
         return status(NOT_IMPLEMENTED);
     }
