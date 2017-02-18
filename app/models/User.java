@@ -1,22 +1,32 @@
 package models;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class User {
 
-    public User(String username, String password, Integer role, Integer status) {
+    public enum Role {
+        ADMIN, USER
+    }
+
+    public User(String username, String password, Role role) {
         this.username = username;
         this.password = password;
         this.role = role;
-        this.status = status;
     }
 
-    String username;
+    private String username;
+    private String password;
+    private Role role;
+    private String authToken;
 
-    String password;
-
-    Integer role;
-
-    Integer status;
+    @Override
+    public String toString() {
+        return "User{" +
+                "username='" + username + '\'' +
+                ", role=" + role +
+                '}';
+    }
 
     public String getUsername() {
         return username;
@@ -26,6 +36,7 @@ public class User {
         this.username = username;
     }
 
+    //@JsonIgnore
     public String getPassword() {
         return password;
     }
@@ -34,19 +45,19 @@ public class User {
         this.password = password;
     }
 
-    public Integer getRole() {
+    public Role getRole() {
         return role;
     }
 
-    public void setRole(Integer role) {
+    public void setRole(Role role) {
         this.role = role;
     }
 
-    public Integer getStatus() {
-        return status;
+    public String getAuthToken() {
+        return authToken;
     }
 
-    public void setStatus(Integer status) {
-        this.status = status;
+    public void setAuthToken(String authToken) {
+        this.authToken = authToken;
     }
 }

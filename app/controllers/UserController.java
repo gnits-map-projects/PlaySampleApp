@@ -1,7 +1,13 @@
 package controllers;
 
+import controllers.security.Authenticator;
+import controllers.security.IsAdmin;
+import controllers.security.IsAdminAction;
+import models.User;
+import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
+import play.mvc.With;
 import services.UserService;
 
 import javax.inject.Inject;
@@ -45,9 +51,46 @@ public class UserController extends Controller {
         return status(NOT_IMPLEMENTED);
     }
 
+    @Authenticator
+    //@IsAdmin
     public Result getCurrentUser() {
 
-        return status(NOT_IMPLEMENTED);
+        /*
+        final String authorized = request().getHeader("Authorization");
+        Logger.debug("Authorized header: {}", authorized);
+
+        if (!authorized.startsWith("Bearer ")) {
+            return unauthorized();
+        }
+
+        final String authToken = authorized.substring(7);
+        if (authorized.isEmpty()) {
+            return unauthorized();
+        }
+
+        Logger.debug("auth_token: {}", authToken);
+
+        final User user = userService.findUserByAuthToken(authToken);
+        if (null == user) {
+            return unauthorized();
+        }
+
+        Logger.debug("user: {}", user);
+
+        */
+
+        final User user = (User) ctx().args.get("user");
+
+        /*
+        if (user.getRole() != User.Role.ADMIN) {
+            return forbidden();
+        }
+        */
+
+
+        // TODO do my stuff
+
+        return ok(Json.toJson(user));
     }
 
 }

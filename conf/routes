@@ -45,13 +45,14 @@ DELETE /images/:id                  controllers.ImageController.deleteImage(id: 
 
 # User controller
 
-POST /user                          controllers.UserController.createUser()
-GET  /user/:id                      controllers.UserController.getUser(id: Integer)
-PUT  /user/:id                      controllers.UserController.updateUser(id: Integer)
-DELETE /user/:id                    controllers.UserController.deleteUser(id: Integer)
-POST /user/signin                   controllers.UserController.signIn()
-POST /user/signout                  controllers.UserController.signOut()
-GET /user/currentUser               controllers.UserController.getCurrentUser()
+POST /users                          controllers.UserController.createUser()
+GET /users/current                   controllers.UserController.getCurrentUser()
+GET  /users/:id                      controllers.UserController.getUser(id: Integer)
+PUT  /users/:id                      controllers.UserController.updateUser(id: Integer)
+DELETE /users/:id                    controllers.UserController.deleteUser(id: Integer)
+POST /users/signin                   controllers.UserController.signIn()
+POST /users/signout                  controllers.UserController.signOut()
+
 
 
 
