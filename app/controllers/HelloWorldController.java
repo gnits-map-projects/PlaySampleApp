@@ -14,6 +14,7 @@ public class HelloWorldController extends Controller {
 
 
     public Result helloMattias() {
+        Logger.info("Hello Mattias Log");
         return ok("Hello Mattias");
     }
 
