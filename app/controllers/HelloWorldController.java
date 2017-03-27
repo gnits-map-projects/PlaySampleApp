@@ -9,6 +9,7 @@ import play.mvc.Result;
 public class HelloWorldController extends Controller {
 
     public Result helloWorld() {
+        Logger.error("helloWorld not found");
         return notFound();
     }
 
