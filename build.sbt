@@ -12,5 +12,6 @@ libraryDependencies ++= Seq(
   javaWs,
   javaJpa,
   "org.hibernate" % "hibernate-entitymanager" % "5.1.0.Final",
-  "mysql" % "mysql-connector-java" % "5.1.36"
+  "mysql" % "mysql-connector-java" % "5.1.36",
+  "com.amazonaws" % "aws-java-sdk" % "1.11.109"
 )

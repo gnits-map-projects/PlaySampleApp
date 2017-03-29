@@ -7,9 +7,13 @@ import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
 import services.ImageStore;
+import services.LocalFileImageStore;
 
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.nio.file.Path;
 
 public class ImageController extends Controller {
@@ -38,14 +42,13 @@ public class ImageController extends Controller {
             return badRequest("Only png images are supported");
         }
 
-        final Path source = image.getFile().toPath();
         try {
-            final String imageId = imageStore.storeImage(source);
-            final String downloadUrl = routes.ImageController.downloadImage(imageId).absoluteURL(request());
+            final String imageId = imageStore.save(image.getFile());
+            final URL downloadUrl = imageStore.downloadUrl(imageId, request());
             Logger.debug("Download url: {}", downloadUrl);
 
             return ok(Json.toJson(downloadUrl));
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return internalServerError("Failed to store uploaded file");
         }
@@ -53,23 +56,18 @@ public class ImageController extends Controller {
     }
 
     public Result downloadImage(String id) {
-        final File file = imageStore.getImage(id);
-        if (null == file) {
+        final InputStream stream = imageStore.get(id);
+        if (null == stream) {
             return notFound("Image not found");
         }
-        return ok(file);
+        return ok(stream);
     }
 
     public Result deleteImage(String id) {
-        try {
-            if (!imageStore.deleteImage(id)) {
-                notFound("Image not found");
-            }
-            return ok();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return internalServerError("Failed to delete image file");
+        if (!imageStore.delete(id)) {
+            notFound("Image not found");
         }
+        return ok();
     }
 
 }
